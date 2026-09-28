@@ -1,0 +1,22 @@
+HTTP/2 200 
+date: Thu, 08 Jan 2026 04:40:42 GMT
+content-type: application/json
+server: cloudflare
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+cache-control: max-age=7200, public
+pragma: cache
+expires: Thu, 08 Jan 2026 06:40:42 GMT
+access-control-allow-origin: *
+access-control-allow-credentials: true
+access-control-allow-methods: GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
+access-control-allow-headers: Origin, X-Requested-With, Content-Type, Accept, Authorization
+access-control-max-age: 86400
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=U5NcX4%2B4Nt%2Fmhxgr39pcO5moEX8W%2F1BEQMAxB%2F3ZoqMmY3SF%2Bi%2BXavwL208XI9ht%2Bc5TO4vPBzStn3GegGKhhspnbhY2ej4CvEJzvlbv"}]}
+cf-cache-status: EXPIRED
+last-modified: Thu, 08 Jan 2026 04:40:42 GMT
+vary: accept-encoding
+cf-ray: 9ba904a5ea0c5724-SIN
+alt-svc: h3=":443"; ma=86400
+
+86400
+

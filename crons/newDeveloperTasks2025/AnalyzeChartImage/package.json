@@ -1,0 +1,19 @@
+{
+  "name": "analyzechartimage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "minimist": "^1.2.6",
+    "node-fetch": "^3.3.2",
+    "openai": "^6.9.0",
+    "sharp": "^0.34.5"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,76 @@
+# 1. Add sensitive files to .gitignore
+cat >> .gitignore <<'EOF'
+
+# Secrets
+.env
+.env.*
+**/.env
+**/.env.*
+**/env
+serviceAccountKey.json
+**/serviceAccountKey.json
+
+# This file currently contains Facebook token
+fb.js
+
+# Dependencies / generated files
+node_modules/
+**/node_modules/
+core
+core.*
+*.log
+screensho.png
+sector_temp/
+EOF
+
+
+
+
+
+
+
+
+
+
+
+# Dependencies
+
+node_modules/
+**/node_modules/
+
+
+**/tempResponse/
+**/tempImages/
+# Core dumps
+core
+core.*
+**/core
+**/core.*
+
+# Logs / temporary
+*.log
+log.txt
+*.tmp
+*.swp
+.DS_Store
+
+# Generated screenshots
+screenshot.png
+screensho.png
+capture-website/screenshot.png
+
+# Environment / secrets
+.env
+.env.*
+serviceAccountKey.json
+**/serviceAccountKey.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS / junk
+Thumbs.db
+
+# Generated/temp data
+sector_temp/

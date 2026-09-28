@@ -1,0 +1,90 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "annotations": {
+      "deployment.kubernetes.io/revision": "1",
+      "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"name\":\"lanka\",\"namespace\":\"default\"},\"spec\":{\"selector\":{\"matchLabels\":{\"app\":\"lanka\",\"tier\":\"backend\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"lanka\",\"tier\":\"backend\"}},\"spec\":{\"containers\":[{\"command\":[\"/bin/sh\",\"-c\",\"cd /src/api \\u0026\\u0026 npm install \\u0026\\u0026 node wsqs.js\"],\"image\":\"node\",\"name\":\"lanka\",\"volumeMounts\":[{\"mountPath\":\"/src\",\"name\":\"nfs\"}]}],\"topologySpreadConstraints\":[{\"labelSelector\":{\"matchLabels\":{\"app\":\"lanka\",\"tier\":\"backend\"}},\"maxSkew\":1,\"topologyKey\":\"kubernetes.io/hostname\",\"whenUnsatisfiable\":\"ScheduleAnyway\"}],\"volumes\":[{\"name\":\"nfs\",\"persistentVolumeClaim\":{\"claimName\":\"nfs\"}}]}}}}\n"
+    },
+    "generation": 1,
+    "name": "lanka",
+    "namespace": "default",
+    "uid": "61a85eda-74ae-486e-a504-4fb3437f5063"
+  },
+  "spec": {
+    "progressDeadlineSeconds": 600,
+    "replicas": 1,
+    "revisionHistoryLimit": 10,
+    "selector": {
+      "matchLabels": {
+        "app": "lanka",
+        "tier": "backend"
+      }
+    },
+    "strategy": {
+      "rollingUpdate": {
+        "maxSurge": "25%",
+        "maxUnavailable": "25%"
+      },
+      "type": "RollingUpdate"
+    },
+    "template": {
+      "metadata": {
+        "creationTimestamp": null,
+        "labels": {
+          "app": "lanka",
+          "tier": "backend"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "command": [
+              "/bin/sh",
+              "-c",
+              "cd /src/api && npm install && node wsqs.js"
+            ],
+            "image": "node",
+            "imagePullPolicy": "Always",
+            "name": "lanka",
+            "resources": {},
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/src",
+                "name": "nfs"
+              }
+            ]
+          }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "terminationGracePeriodSeconds": 30,
+        "topologySpreadConstraints": [
+          {
+            "labelSelector": {
+              "matchLabels": {
+                "app": "lanka",
+                "tier": "backend"
+              }
+            },
+            "maxSkew": 1,
+            "topologyKey": "kubernetes.io/hostname",
+            "whenUnsatisfiable": "ScheduleAnyway"
+          }
+        ],
+        "volumes": [
+          {
+            "name": "nfs",
+            "persistentVolumeClaim": {
+              "claimName": "nfs"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
