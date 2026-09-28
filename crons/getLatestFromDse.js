@@ -562,10 +562,11 @@ mds().then((r)=>{
             sequelize.query(`update instruments set nv = ${dsexNVVOl} where code = 'DSEX'`)
             // generate sector cchart from latest instruments data
 const maxDateQuery = 'SELECT @maxDate := DATE(MAX(updated_at)) FROM instruments';
-const secctorquery = `INSERT INTO instruments (code, open, high, low, close, ycp, volume, trades, value, updated_at) 
+// Compute nv before replacing the previous sector volume and trading date.
+const secctorquery = `INSERT INTO instruments (code, open, high, low, close, ycp, volume, nv, trades, value, updated_at)
                      SELECT sector_lists.name, ROUND(AVG(instruments.open), 2) AS open, ROUND(AVG(instruments.high), 2) AS high, 
                       ROUND(AVG(instruments.low), 2) AS low, ROUND(AVG(instruments.close), 2) AS close, eod.close as ycp,
-                      ROUND(SUM(instruments.volume)) AS volume, ROUND(SUM(instruments.trades), 2) AS trades,  
+                      ROUND(SUM(instruments.volume)) AS volume, ROUND(SUM(instruments.volume)) AS nv, ROUND(SUM(instruments.trades), 2) AS trades,
                       ROUND(SUM(instruments.value), 2) AS value, MAX(updated_at) AS updated_at
                       FROM (SELECT sector_id,  open, high, low, close, ycp, IF(@maxDate = DATE(updated_at), volume, 0) AS volume, IF(@maxDate = DATE(updated_at), trades, 0) AS trades, IF(@maxDate = DATE(updated_at), value, 0) AS value , updated_at FROM instruments WHERE sector_id NOT IN (23, 24, 22) AND sme != 1) AS instruments
                       LEFT JOIN sector_lists ON sector_lists.id = sector_id
@@ -575,7 +576,9 @@ const secctorquery = `INSERT INTO instruments (code, open, high, low, close, ycp
                            WHERE date < @maxDate
                        )
                       GROUP BY sector_id
-                      ON DUPLICATE KEY UPDATE open = VALUES(open), high = VALUES(high), low = VALUES(low), close = VALUES(close), ycp = VALUES(ycp), volume = VALUES(volume), trades = VALUES(trades), value = VALUES(value), updated_at = VALUES(updated_at)`;
+                      ON DUPLICATE KEY UPDATE
+                      nv = GREATEST(0, IF(DATE(updated_at) = DATE(VALUES(updated_at)), VALUES(volume) - COALESCE(volume, 0), VALUES(volume))),
+                      open = VALUES(open), high = VALUES(high), low = VALUES(low), close = VALUES(close), ycp = VALUES(ycp), volume = VALUES(volume), trades = VALUES(trades), value = VALUES(value), updated_at = VALUES(updated_at)`;
 
      
    await sequelize.query(maxDateQuery);
