@@ -8,7 +8,7 @@ const HtmlTableToJson = require('html-table-to-json');
 
 async function main() {
     // var html = await axios.get('https://dse.stocknow.mobi/cbul.php')
-    var html = await axios.get('https://dse.stocknow.mobi/cbul.php', { ...proxy, timeout: 20000 })
+    var html = await axios.get('https://dsebd.org/cbul.php', { ...proxy, timeout: 20000 })
 
     const $ = cheerio.load(html.data)
     const data = []
