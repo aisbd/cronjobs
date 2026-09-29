@@ -26,6 +26,7 @@ var mds = require('./test')
 // return 
 
 function createNewInstrument(code) {
+    return
     // console.log(code, 'this is create new instroment code console log')
         try {
                 axios.get('https://dse.stocknow.mobi/displayCompany.php?name='+code).then((r)=>{
