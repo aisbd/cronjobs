@@ -26,11 +26,23 @@ var mds = require('./test')
 // abc()
 // return 
 
-async function createNewInstrument(code) {
+const pendingInstrumentCreations = new Set();
+
+async function requestWithDeadline(request, timeout) {
+    // Axios's socket timeout alone may not cover DNS resolution.
+    const cancellation = axios.CancelToken.source();
+    const timer = setTimeout(() => cancellation.cancel(`Request timed out after ${timeout} ms`), timeout);
     try {
-        const response = await axios.get(`https://www.dse.com.bd/company/${encodeURIComponent(code)}`, {
-            timeout: 20000,
-        });
+        return await request({ timeout, cancelToken: cancellation.token });
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+async function createNewInstrument(code) {
+    const url = `https://www.dse.com.bd/company/${encodeURIComponent(code)}`;
+    try {
+        const response = await requestWithDeadline(options => axios.get(url, options), 20000);
         const company = parseCompanyPage(response.data, code);
         const sectors = await new Promise((resolve, reject) => {
             db.query('SELECT id, name FROM sector_lists', (err, result) => {
@@ -50,6 +62,24 @@ async function createNewInstrument(code) {
         return true;
     } catch (err) {
         console.error(`Failed to create instrument ${code}:`, err.message);
+        try {
+            await requestWithDeadline(options => axios.post('https://stocknow.com.bd/api/v1/contact', {
+                name: 'System Cron message',
+                mobile: 'err',
+                device: 'server',
+                message: [
+                    'Admin alert: getLatestFromDse.js could not create a new instrument.',
+                    `Instrument: ${code}`,
+                    `URL: ${url}`,
+                    `Error: ${err.message}`,
+                    err.code ? `Error code: ${err.code}` : '',
+                    err.response ? `HTTP status: ${err.response.status}` : '',
+                    'This instrument was skipped; market updates will continue.',
+                ].filter(Boolean).join('\n'),
+            }, options), 5000);
+        } catch (notificationError) {
+            console.error(`Failed to notify admin about ${code}:`, notificationError.message);
+        }
         return false;
     }
 }
@@ -214,7 +244,9 @@ mds().then((r)=>{
             // check is database have this instruments
             if(!instruments[code]){
                 // instrument is noot in table have to insert
-                await createNewInstrument(code)
+                const creation = createNewInstrument(code);
+                pendingInstrumentCreations.add(creation);
+                creation.then(() => pendingInstrumentCreations.delete(creation));
                 continue;
             }
 
@@ -583,7 +615,7 @@ const secctorquery = `INSERT INTO instruments (code, open, high, low, close, ycp
                                 axios.post("https://ws.stocknow.com.bd/push/trades/TradeUpdate", {data: `${tradeData.TRD_TOTAL_TRADES}|${tradeData.TRD_TOTAL_VOLUME}|${tradeData.TRD_TOTAL_VALUE}`}).then((r)=>{console.log('sent to socket')}).catch((e)=>{console.log("error on socket req", e.response)})
                                
                                 axios.post("https://vip.stocknow.com.bd/v1/crons/UpdateFileData", {data: r.data}).then((r)=>{
-                                            console.log('sent to file data', r.data)    
+                                            console.log('sent to file data')    
                                             // now broadcast all chart candles update
                                             axios.post('https://ws.stocknow.com.bd/chartUpdate', {data:r.data})
                                         }).catch((e)=>{console.log("error on file data", e.response)})
@@ -684,7 +716,9 @@ const secctorquery = `INSERT INTO instruments (code, open, high, low, close, ycp
 
 // connection.end();
 
-setTimeout(function() {
+setTimeout(async function() {
+    // Let bounded company requests and their admin alerts finish before exiting.
+    await Promise.allSettled(Array.from(pendingInstrumentCreations));
     connection.end();
     process.exit();
 }, 30000);
