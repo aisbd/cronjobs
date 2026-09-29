@@ -3,6 +3,7 @@ var axios = require('axios');
 var DomParser = require('dom-parser');
 var parser = new DomParser();
 var db = require('../db');
+const { parseCompanyPage, findCompanySector } = require('./companyParser');
 
 var keyBy = require('lodash.keyby');
 var moment = require('moment');
@@ -25,54 +26,32 @@ var mds = require('./test')
 // abc()
 // return 
 
-function createNewInstrument(code) {
-    return
-    // console.log(code, 'this is create new instroment code console log')
-        try {
-                axios.get('https://dse.stocknow.mobi/displayCompany.php?name='+code).then((r)=>{
-                const regex = /<th>Sector<\/th>.+?<td>(.+?)<\/td>/gims;
-                const nameRegx = /Company Name: <i>(.+?)<\/i>/gims;
-                const found = [...r.data.matchAll(regex)];
-                var name = [...r.data.matchAll(nameRegx)];
+async function createNewInstrument(code) {
+    try {
+        const response = await axios.get(`https://www.dse.com.bd/company/${encodeURIComponent(code)}`, {
+            timeout: 20000,
+        });
+        const company = parseCompanyPage(response.data, code);
+        const sectors = await new Promise((resolve, reject) => {
+            db.query('SELECT id, name FROM sector_lists', (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+        const sector = findCompanySector(sectors, company.sector);
 
-                try {
-                var sector = (found[0][1]);
-                name = name[0][1];
-
-                } catch(e) {
-                    return 
-                    sector = "Miscellaneous"
-                    // statements
-                    console.log(e);
-                }
-
-
-                    db.query("select `id` from sector_lists where name = '"+sector+"'", (err, result)=>{
-                        if(err){
-                            // throw "Sector not found";
-                        }
-                        var sector_id = result[0].id;
-                        var q = "insert into instruments (`code`, `name`, `sector_id`) values ('"+code+"', '"+name+"', '"+sector_id+"')";
-                        db.query(q, function (e) {
-                            if(e){
-                                // throw  "Insert failed";
-                            }                   
-                        })
-
-                        // db.query()
-
-                    })
-                    // console.log(match)
-                })
-        } catch(e) {
-            // statements
-           // console.log(e)
-            // axios.post("https://stocknow.mobi/v1/contact", {name: "System Cron message", mobile:'err', device:'server', message: "New share insert failed\n"+JSON.stringify(e)}).then((r)=>{
-            //     console.log("ssssmmm")
-            // })
-         
-        }
-
+        await new Promise((resolve, reject) => {
+            db.query('INSERT INTO instruments (`code`, `name`, `sector_id`) VALUES (?, ?, ?)',
+                [code, company.name, sector.id], (err, result) => {
+                    if (err) return reject(err);
+                    resolve(result);
+                });
+        });
+        return true;
+    } catch (err) {
+        console.error(`Failed to create instrument ${code}:`, err.message);
+        return false;
+    }
 }
 
  var updateIndex = require('./updateIndex');
@@ -235,7 +214,7 @@ mds().then((r)=>{
             // check is database have this instruments
             if(!instruments[code]){
                 // instrument is noot in table have to insert
-                createNewInstrument(code)
+                await createNewInstrument(code)
                 continue;
             }
 
