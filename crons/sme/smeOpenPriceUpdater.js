@@ -11,7 +11,7 @@
 //     var instruments = instruments[0]
 //     for(var k in instruments){
 //        var instrument = instruments[k]
-//      var url = "https://sme.dsebd.org/sme_displayCompany.php?name="+instrument.code
+//      var url = "https://sme.old.dsebd.org/sme_displayCompany.php?name="+instrument.code
 //        var r = await axios.get(url)    
 //        var html = r.data
 //         var regex = />Opening Price.+?([0-9.,]+?)<\/td/gims

@@ -342,7 +342,7 @@ async function main() {
                 var url = 'dse.stocknow.mobi/displayCompany.php'
                 if(instrument.sme){
                     console.log('sme website called')
-                    url = 'sme.dsebd.org/sme_displayCompany.php'
+                    url = 'sme.old.dsebd.org/sme_displayCompany.php'
                 }
   
                    result = await axios.get('https://'+url+'?name='+instrument.code, {}, {...proxy, timeout: 20000,

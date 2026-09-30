@@ -656,9 +656,9 @@ const secctorquery = `INSERT INTO instruments (code, open, high, low, close, ycp
 
          // console.log('sdff')
     
-        /*dsebd.org latest sharee price parse, !!!!open price is missing there !!!!*/
+        /*old.dsebd.org latest sharee price parse, !!!!open price is missing there !!!!*/
             //     // console.log(instruments['ADNTEL'].ycp)
-            //     axios.get('https://www.dsebd.org/latest_share_price_all.php').then((r)=>{
+            //     axios.get('https://www.old.dsebd.org/latest_share_price_all.php').then((r)=>{
             //         var dom = parser.parseFromString(r.data);
             //         var rows = dom.getElementsByTagName("tr");
             // // 1 code , 2 ltp, 3 high, 4 low, 5 closep, 6 ycp, 8 trade, 9 value, 10 volume
@@ -680,7 +680,7 @@ const secctorquery = `INSERT INTO instruments (code, open, high, low, close, ycp
             //             var trades = parseInt(cols[8].textContent.trim().replace(/,/g, ''))
             //             var value = parseFloat(cols[9].textContent.trim().replace(/,/g, ''))
             //             var volume = parseInt(cols[10].textContent.trim().replace(/,/g, ''))
-                /*dsebd.org latest sharee price parse, !!!!open price is missing there !!!!*/
+                /*old.dsebd.org latest sharee price parse, !!!!open price is missing there !!!!*/
 
 
                 /* parse stockbangladesh.com to dse database parser !!!!*/

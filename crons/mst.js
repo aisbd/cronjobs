@@ -10,7 +10,7 @@ async function main() {
    
   var datee = new Date();
 
-   var txt = await axios.get('https://dsebd.org/mst.txt?a='+datee.getTime(), { ...proxy, timeout: 20000 })
+   var txt = await axios.get('https://old.dsebd.org/mst.txt?a='+datee.getTime(), { ...proxy, timeout: 20000 })
    txt = txt.data
 
 
