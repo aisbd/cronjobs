@@ -556,7 +556,7 @@ mds().then((r)=>{
     
         /*old.dsebd.org latest sharee price parse, !!!!open price is missing there !!!!*/
             //     // console.log(instruments['ADNTEL'].ycp)
-            //     axios.get('https://www.old.dsebd.org/latest_share_price_all.php').then((r)=>{
+            //     axios.get('https://old.dsebd.org/latest_share_price_all.php').then((r)=>{
             //         var dom = parser.parseFromString(r.data);
             //         var rows = dom.getElementsByTagName("tr");
             // // 1 code , 2 ltp, 3 high, 4 low, 5 closep, 6 ycp, 8 trade, 9 value, 10 volume
