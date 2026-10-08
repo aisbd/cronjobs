@@ -49,7 +49,7 @@ async function getShareHoldingDataFromCSE(symbol) {
   
         var url = 'old.dsebd.org/displayCompany.php'
         if(symbol.sme){
-            url = 'sme.old.dsebd.org/sme_displayCompany.php'
+            url = 'sme.dsebd.org/sme_displayCompany.php'
         }        
         console.log(url)
         // console.log(symbol.code)
