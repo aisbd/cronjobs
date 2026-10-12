@@ -8,6 +8,21 @@ const source = fs.readFileSync(path.join(__dirname, 'getLatestFromDse.js'), 'utf
 const contactUrl = 'https://stocknow.com.bd/api/v1/contact';
 const flush = () => new Promise(resolve => setImmediate(resolve));
 
+test('sector change uses the same constituents for close and ycp', () => {
+    assert.match(source, /ROUND\(AVG\(instruments\.close\), 2\) AS close, ROUND\(AVG\(instruments\.ycp\), 2\) AS ycp/);
+    assert.match(source, /IF\(@maxDate = DATE\(updated_at\), ycp, close\) AS ycp/);
+    assert.doesNotMatch(source, /eod\.close as ycp/);
+});
+
+test('stale sector constituents become flat candles with no activity', () => {
+    for (const field of ['open', 'high', 'low']) {
+        assert.ok(source.includes(`IF(@maxDate = DATE(updated_at), ${field}, close) AS ${field}`));
+    }
+    for (const field of ['volume', 'trades', 'value']) {
+        assert.ok(source.includes(`IF(@maxDate = DATE(updated_at), ${field}, 0) AS ${field}`));
+    }
+});
+
 function deferred() {
     let resolve;
     let reject;
